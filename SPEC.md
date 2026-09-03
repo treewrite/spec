@@ -38,3 +38,11 @@ There are motivations behind the decision to use `.jsonl` and not other storage 
 1. **Isolated corruption:** A poorly formatted line (interrupted writing, incorrect manual editing) invalidates a single bullet point, not all of them
 1. **Centralization:** All bullet points are stored in a single file, instead of being scattered across multiple files
 1. **Predictable scalability:** The cost of any operation (write, read) is linear to the number and size of bullet points, with no operations affected by the depth of the tree (as would be the case in nested JSON recursion or a Markdown list)
+
+## Metadata format
+
+The first line of a TreeWrite file is a JSON object containing file metadata. The object has the following fields:
+
+| Field     | Description |
+| --------- | ----------- |
+| `version` |             |
