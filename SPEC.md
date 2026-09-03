@@ -41,7 +41,7 @@ There are motivations behind the decision to use `.jsonl` and not other storage 
 
 ## Metadata format
 
-The first line of a TreeWrite file is a JSON object containing file metadata. The object has the following fields:
+The first line the file is a JSON object containing file metadata. The object has the following fields:
 
 | Field     | Description |
 | --------- | ----------- |
