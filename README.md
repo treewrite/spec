@@ -1,0 +1,2 @@
+# spec
+📄 TreeWrite file specification
