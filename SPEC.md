@@ -32,7 +32,7 @@ In TreeWrite format, each line is a JSON object. The first line contains file me
 
 There are motivations behind the decision to use `.jsonl` and not other storage methods. Here they are:
 
-1. **Text file:** The `.json` file is a text file, not a binary one, which makes it more accessible for manual editing and integration with tools like [Git](https://git-scm.com)
+1. **Text file:** The `.jsonl` file is a text file, not a binary one, which makes it more accessible for manual editing and integration with tools like [Git](https://git-scm.com)
 1. **File diffs:** changing a bullet point is equivalent to changing a single line of the file, which makes it easier to view file diffs in tools like Git
 1. **Merge by line:** Text merge tools operate on lines. Two devices editing different bullet points never produce conflicts. A conflict only exists when editing the same bullet point, and the resolution remains local to that line
 1. **Isolated corruption:** A poorly formatted line (interrupted writing, incorrect manual editing) invalidates a single bullet point, not all of them
