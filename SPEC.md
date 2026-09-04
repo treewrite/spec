@@ -18,6 +18,8 @@ To understand why we created a new specification instead of using an existing on
 
 The key words "MUST", "MUST NOT", "REQUIRED", "SHOULD", "SHOULD NOT", and "MAY" in this document are to be interpreted as described in [RFC 2119](https://www.ietf.org/rfc/rfc2119.txt)
 
+Only the capitalized forms of these words (e.g. `MUST`, not `must`) carry normative meaning in this document. Lowercase occurrences are used with their ordinary English meaning and impose no compliance requirement
+
 ## The `.jsonl` file
 
 A `.jsonl` file (a.k.a. [JSON Lines](https://jsonlines.org)) is a known file format that stores one valid JSON per line of the file (separated by `\n`). Each line is treated as a valid and independent JSON
@@ -59,7 +61,7 @@ All lines in the file, except the first, represent bullet points. Each bullet po
 | ------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `id`         | A [ULID](https://github.com/ulid/spec) to differentiate the bullet points                                                                                               |
 | `updated_at` | Last bullet point update date. Represented by a number, the total milliseconds since the [Unix epoch](https://en.wikipedia.org/wiki/Unix_time)                          |
-| `parent`     | The ULID of the parent bullet point (which allows for a tree structure). It must be null if it is not nested                                                            |
+| `parent`     | The ULID of the parent bullet point (which allows for a tree structure). It MUST be null if it is not nested                                                            |
 | `order`      | A sequential number, starting from zero, representing the bullet point index in the direct children of its parent. (ex. 2, meaning that it is the parent's third child) |
 | `type`       | The type that the bullet point represents (ex. text, code, etc.). See the complete [list of types]()                                                                    |
 
@@ -67,11 +69,11 @@ All lines in the file, except the first, represent bullet points. Each bullet po
 
 The specification follows [semantic versioning](https://semver.org). The `version` field in the metadata contains the current major version of the file
 
-If the version is larger than what some parser currently supports (ex. metadata with version 2 with parser implementing major version 1), then the file should not be opened by the parser, since the parser is trying to read a version that is not compatible with its implementation
+If the version is larger than what some parser currently supports (ex. metadata with version 2 with parser implementing major version 1), then the file MUST NOT be opened by the parser, since the parser is trying to read a version that is not compatible with its implementation
 
 For example, if in a major version 2 we rename a [bullet point type](), a parser following major version 1 will not know about this renaming and will incorrectly ignore the bullet point
 
-However, if the parser implements a major version larger than the file's version, it should be able to open and edit the older major version. In other words, a parser that supports a major version X should support all major versions older than X
+However, if the parser implements a major version larger than the file's version, it MUST be able to open and edit the older major version. In other words, a parser that supports a major version X MUST support all major versions older than X
 
 ## Bullet point types
 
@@ -98,9 +100,9 @@ The `divider` type does not have any custom fields. It represents a line that vi
 
 ## Inline markdown text
 
-The content of some bullet fields may support inline markdown. This means that the outliner application must render/style this markdown in the user interface
+The content of some bullet fields may support inline markdown. This means that the outliner application MUST render/style this markdown in the user interface
 
-The following markdown syntax must be supported:
+The following markdown syntax MUST be supported:
 
 - `**bold**`
 - `*italic*`
@@ -113,23 +115,23 @@ This section lists and details some inconsistency scenarios that could (but shou
 
 ### `parent` points to an `id` that does not exist in the file
 
-Treat it as `parent: null`, promoting the bullet to the root. Never discard the bullet (to avoid data loss) and never lock the parser
+A parser MUST treat it as `parent: null`, promoting the bullet to the root. A parser MUST NOT discard the bullet, and MUST NOT fail to load the rest of the file because of it
 
 ### Cycle in the tree (A is the parent of B, B is the parent of C, C is the parent of A)
 
-It can be detected during tree loading. Upon finding the cycle, break it by obtaining the bullet with the highest `id` (ULID is sortable) and treat it as `parent: null`
+It can be detected during tree loading. Upon finding the cycle, a parser MUST break it by obtaining the bullet with the highest `id` (ULID is sortable) and treat it as `parent: null`
 
 ### Duplicate `id`
 
-Two or more bullets with the same `id`. The bullet on the last line of the file must be considered, discarding the other repeated bullets
+Two or more bullets with the same `id`. The bullet on the last line of the file MUST be considered, discarding the other repeated bullets
 
 ### Line with syntactically invalid/malformed JSON
 
-Discard the poorly formatted bullet line
+A parser MUST discard the poorly formatted bullet line. A parser MUST NOT fail to load the rest of the file because of it
 
 ### `id` that is not a valid ULID
 
-The entire bullet point is invalid. The parser must treat it the same way as a malformed JSON
+The entire bullet point is invalid. The parser MUST treat it the same way as a malformed JSON
 
 ### Required bullet field missing
 
@@ -137,24 +139,24 @@ Invalid line, treated as malformed. Unlike an unknown field (which is preserved)
 
 ### Unknown `type`
 
-A bullet point indicating an unknown type (not mentioned in this specification) must be ignored by the parser
+A bullet point indicating an unknown type (not mentioned in this specification) MUST be preserved by the parser, keeping its required fields intact within the tree. The parser MUST NOT discard the bullet or remove it from the tree. The outliner application SHOULD render it with a generic fallback (e.g. displaying the raw content or a "type not supported" notice). Fields specific to the unknown type are subject to the [Preservation of unknown fields](#preservation-of-unknown-fields) rule below
 
 ### `type` recognized but wrong schema for that type
 
-For example: type `image` but without the `src` field. The parser must preserve the bullet's state, and the outliner application should provide a visual fallback
+For example: type `image` but without the `src` field. The parser MUST preserve the bullet's state, and the outliner application SHOULD provide a visual fallback
 
 ### Metadata with invalid schema/Missing metadata
 
-Treat this as an invalid file. The parser must not open the TreeWrite file
+Treat this as an invalid file. The parser MUST NOT open the TreeWrite file
 
 ### `version` with a major greater than what the parser supports
 
-As discussed in the [Versioning]() section, the parser must not be able to open the file
+As discussed in the [Versioning]() section, the parser MUST NOT open the file
 
 ### Duplicate `order` for the same `parent`
 
-If two or more bullets have the same order and the same parent, then the tiebreaker must be the order of the `id` (orderable ULID). The bullet with the lexicographically smaller ULID should come first. The order of the parent bullets that are not incorrect must be preserved
+If two or more bullets have the same order and the same parent, then the tiebreaker MUST be the order of the `id` (orderable ULID). The bullet with the lexicographically smaller ULID SHOULD come first. The order of the parent bullets that are not incorrect MUST be preserved
 
 ### Preservation of unknown fields
 
-Any additional fields in JSON objects beyond those defined in this specification must not be discarded during a read/rewrite to avoid data loss
+Any additional fields in JSON objects beyond those defined in this specification MUST NOT be discarded during a read/rewrite to avoid data loss
