@@ -101,7 +101,7 @@ The following markdown syntax must be supported:
 - `**bold**`
 - `*italic*`
 - `***italic & bold***`
-- `[Some link](https://example.com]`
+- `[Some link](https://example.com)`
 
 ## Handling inconsistencies
 
@@ -121,7 +121,7 @@ Two or more bullets with the same `id`. The bullet on the last line of the file 
 
 ### Line with syntactically invalid/malformed JSON
 
-Ignore the bullet line. Do not discard it to avoid loss of information
+Discard the poorly formatted bullet line.
 
 ### `id` that is not a valid ULID
 
@@ -142,3 +142,15 @@ Treat this as an invalid file. The parser should not open the TreeWrite file
 ### `version` with a major greater than what the parser supports
 
 As discussed in the [Versioning]() section, the parser should not be able to open the file
+
+### Duplicate `order` for the same `parent`
+
+If two or more bullets have the same order and the same parent, then the tiebreaker must be the order of the `id` (orderable ULID). Bullets with fewer ULIDs should come first. The order of the parent bullets that are not incorrect must be preserved
+
+### Unknown `type`
+
+A bullet point indicating an unknown type (not mentioned in this specification) must be ignored by the parser
+
+### Preservation of unknown fields
+
+Any additional fields in JSON objects beyond those defined in this specification should not be discarded during a read/rewrite to avoid data loss
