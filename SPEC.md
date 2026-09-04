@@ -73,11 +73,26 @@ However, if the parser implements a major version larger than the file's version
 
 ### `text`
 
+The `text` type represents any single-paragraph text (without new lines). New lines are not supported as they can easily be represented by new bullets. It has the following fields:
+
+| Field  | Description                                                        |
+| ------ | ------------------------------------------------------------------ |
+| `text` | A string without newlines (`\n`). Accepts [Inline markdown text]() |
+
 ### `quote`
+
+The `quote` type represents a quote from an author. It has the following fields:
+
+| Field    | Description                                                                                           |
+| -------- | ----------------------------------------------------------------------------------------------------- |
+| `text`   | The quotation itself. Accepts [Inline markdown text]()                                                |
+| `author` | The name of the author who quoted this quote. Semantically, it can be any source (person, book, etc.) |
 
 ### `divider`
 
-The divider type does not have any custom fields. It represents a line that visually divides the user interface
+The `divider` type does not have any custom fields. It represents a line that visually divides the user interface
+
+## Inline markdown text
 
 ## Handling inconsistencies
 
