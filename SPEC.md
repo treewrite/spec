@@ -85,6 +85,8 @@ The `text` type represents any single-paragraph text (without new lines). New li
 | ------ | --------------------------------------------------------------------------------------- |
 | `text` | A string without newlines (`\n`). Accepts [Inline markdown text](#inline-markdown-text) |
 
+A parser MUST replace all `\n` with a single space if it encounters them in the `text` field
+
 ### `quote`
 
 The `quote` type represents a quote from an author. It has the following fields:
