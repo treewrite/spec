@@ -14,6 +14,10 @@ It's an open format, meaning any outliner or developer can use this format for a
 
 To understand why we created a new specification instead of using an existing one (such as [OPML 2.0](https://opml.org/spec2.opml)), see [this section]()
 
+## Conventions used in this document
+
+The key words "MUST", "MUST NOT", "REQUIRED", "SHOULD", "SHOULD NOT", and "MAY" in this document are to be interpreted as described in [RFC 2119](https://www.ietf.org/rfc/rfc2119.txt)
+
 ## The `.jsonl` file
 
 A `.jsonl` file (a.k.a. [JSON Lines](https://jsonlines.org)) is a known file format that stores one valid JSON per line of the file (separated by `\n`). Each line is treated as a valid and independent JSON
@@ -117,40 +121,40 @@ It can be detected during tree loading. Upon finding the cycle, break it by obta
 
 ### Duplicate `id`
 
-Two or more bullets with the same `id`. The bullet on the last line of the file should be considered, ignoring the other repeated bullets. Do not discard the other bullets to avoid data loss
+Two or more bullets with the same `id`. The bullet on the last line of the file must be considered, discarding the other repeated bullets
 
 ### Line with syntactically invalid/malformed JSON
 
-Discard the poorly formatted bullet line.
+Discard the poorly formatted bullet line
 
 ### `id` that is not a valid ULID
 
-The entire bullet point is invalid. The parser should treat it the same way as a malformed JSON
+The entire bullet point is invalid. The parser must treat it the same way as a malformed JSON
 
-### Required field missing
+### Required bullet field missing
 
 Invalid line, treated as malformed. Unlike an unknown field (which is preserved), a missing required field prevents the reconstruction of a minimally coherent bullet point, so the line cannot be promoted to a valid bullet point
-
-### `type` recognized but wrong schema for that type
-
-For example: type `image` but without the `src` field. The parser should neither ignore nor discard the bullet point. Render it with the missing fields using a default fallback value
-
-### Metadata with invalid schema
-
-Treat this as an invalid file. The parser should not open the TreeWrite file
-
-### `version` with a major greater than what the parser supports
-
-As discussed in the [Versioning]() section, the parser should not be able to open the file
-
-### Duplicate `order` for the same `parent`
-
-If two or more bullets have the same order and the same parent, then the tiebreaker must be the order of the `id` (orderable ULID). Bullets with fewer ULIDs should come first. The order of the parent bullets that are not incorrect must be preserved
 
 ### Unknown `type`
 
 A bullet point indicating an unknown type (not mentioned in this specification) must be ignored by the parser
 
+### `type` recognized but wrong schema for that type
+
+For example: type `image` but without the `src` field. The parser must preserve the bullet's state, and the outliner application should provide a visual fallback
+
+### Metadata with invalid schema/Missing metadata
+
+Treat this as an invalid file. The parser must not open the TreeWrite file
+
+### `version` with a major greater than what the parser supports
+
+As discussed in the [Versioning]() section, the parser must not be able to open the file
+
+### Duplicate `order` for the same `parent`
+
+If two or more bullets have the same order and the same parent, then the tiebreaker must be the order of the `id` (orderable ULID). The bullet with the lexicographically smaller ULID should come first. The order of the parent bullets that are not incorrect must be preserved
+
 ### Preservation of unknown fields
 
-Any additional fields in JSON objects beyond those defined in this specification should not be discarded during a read/rewrite to avoid data loss
+Any additional fields in JSON objects beyond those defined in this specification must not be discarded during a read/rewrite to avoid data loss
