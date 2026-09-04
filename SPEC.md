@@ -94,6 +94,15 @@ The `divider` type does not have any custom fields. It represents a line that vi
 
 ## Inline markdown text
 
+The content of some bullet fields may support inline markdown. This means that the outliner application must render/style this markdown in the user interface
+
+The following markdown syntax must be supported:
+
+- `**bold**`
+- `*italic*`
+- `***italic & bold***`
+- `[Some link](https://example.com]`
+
 ## Handling inconsistencies
 
 This section lists and details some inconsistency scenarios that could (but should not) eventually be found in a TreeWrite file, and how a parser should behave in each scenario
