@@ -91,7 +91,7 @@ The `text` type represents any single-paragraph text (without new lines). New li
 | ------ | --------------------------------------------------------------------------------------- |
 | `text` | A string without newlines (`\n`). Accepts [Inline markdown text](#inline-markdown-text) |
 
-A parser MUST replace all `\n` with a single space if it encounters them in the `text` field
+A parser MUST replace each newline sequence (`\n`, `\r\n` or `\r`) found in the `text` field with a single space. A `\r\n` pair counts as one sequence, so it becomes one space, not two
 
 ### `quote`
 
