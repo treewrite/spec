@@ -8,7 +8,7 @@ The purpose of this format is to propose an open standard by which [outliner app
 
 The design goal is to have a transparent, human-readable format that is backward compatible with previous versions, so that notes written today can still be accessed by outliners 20 years from now. We prioritize simplicity and stability over abrupt changes
 
-The TreeWrite format was created specifically for the [TreeWrite text editor](https://treewrite.com), but since it's an open format, it can be used by any other tools. This document also serves as a guide for implementing a TreeWrite format parser. See the [official TreeWrite parser]()
+The TreeWrite file format was created specifically for the [TreeWrite text editor](https://treewrite.com), but since it's an open format, it can be used by any other tools. This document also serves as a guide for implementing a TreeWrite format parser. See the [official TreeWrite parser]()
 
 It's an open format, meaning any outliner or developer can use this format for any purpose. The specification license is [CC0 1.0 Universal](https://github.com/treewrite/spec/blob/main/LICENSE)
 
@@ -89,18 +89,36 @@ This section lists and details some inconsistency scenarios that could (but shou
 
 ### `parent` points to an `id` that does not exist in the file
 
+Treat it as `parent: null`, promoting the bullet to the root. Never discard the bullet (to avoid data loss) and never lock the parser
+
 ### Cycle in the tree (A is the parent of B, B is the parent of C, C is the parent of A)
+
+It can be detected during tree loading. Upon finding the cycle, break it by obtaining the bullet with the highest `id` (ULID is sortable) and treat it as `parent: null`
 
 ### Duplicate `id`
 
+Two or more bullets with the same `id`. The bullet on the last line of the file should be considered, ignoring the other repeated bullets. Do not discard the other bullets to avoid data loss
+
+### Line with syntactically invalid/malformed JSON
+
+Ignore the bullet line. Do not discard it to avoid loss of information
+
 ### `id` that is not a valid ULID
 
-### Line with syntactically invalid JSON
+The entire bullet point is invalid. The parser should treat it the same way as a malformed JSON
 
 ### Required field missing
 
+Invalid line, treated as malformed. Unlike an unknown field (which is preserved), a missing required field prevents the reconstruction of a minimally coherent bullet point, so the line cannot be promoted to a valid bullet point
+
 ### `type` recognized but wrong schema for that type
+
+For example: type `image` but without the `src` field. The parser should neither ignore nor discard the bullet point. Render it with the missing fields using a default fallback value
 
 ### Metadata with invalid schema
 
+Treat this as an invalid file. The parser should not open the TreeWrite file
+
 ### `version` with a major greater than what the parser supports
+
+As discussed in the [Versioning]() section, the parser should not be able to open the file
