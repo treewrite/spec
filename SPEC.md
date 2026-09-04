@@ -8,11 +8,11 @@ The purpose of this format is to propose an open standard by which [outliner app
 
 The design goal is to have a transparent, human-readable format that is backward compatible with previous versions, so that notes written today can still be accessed by outliners 20 years from now. We prioritize simplicity and stability over abrupt changes
 
+The TreeWrite format was created specifically for the [TreeWrite text editor](https://treewrite.com), but since it's an open format, it can be used by any other tools. This document also serves as a guide for implementing a TreeWrite format parser. See the [official TreeWrite parser]()
+
 It's an open format, meaning any outliner or developer can use this format for any purpose. The specification license is [CC0 1.0 Universal](https://github.com/treewrite/spec/blob/main/LICENSE)
 
-The TreeWrite format was created specifically for the [TreeWrite text editor](https://treewrite.com), but since it's an open format, it can be used by any other tools
-
-> To understand why we created a new specification instead of using an existing one (such as [OPML 2.0](https://opml.org/spec2.opml)), see [this section]()
+To understand why we created a new specification instead of using an existing one (such as [OPML 2.0](https://opml.org/spec2.opml)), see [this section]()
 
 ## The `.jsonl` file
 
@@ -41,8 +41,66 @@ There are motivations behind the decision to use `.jsonl` and not other storage 
 
 ## Metadata format
 
-The first line the file is a JSON object containing file metadata. The object has the following fields:
+The first line of the file is a JSON object containing file metadata. The object has the following fields:
 
-| Field     | Description |
-| --------- | ----------- |
-| `version` |             |
+| Field     | Description                                                                                                                            |
+| --------- | -------------------------------------------------------------------------------------------------------------------------------------- |
+| `version` | The current major version (ex. 1) of the specification that the file is following. See the [Versioning]() section for more information |
+
+## Bullet point format
+
+All lines in the file, except the first, represent bullet points. Each bullet point is a JSON object. All bullet points have fields in common, in addition to fields specific to each bullet point type. The following fields are common to all bullet points:
+
+| Field        | Description                                                                                                                                                             |
+| ------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `id`         | A [ULID](https://github.com/ulid/spec) to differentiate the bullet points                                                                                               |
+| `updated_at` | Last bullet point update date. Represented by a number, the total milliseconds since the [Unix epoch](https://en.wikipedia.org/wiki/Unix_time)                          |
+| `parent`     | The ULID of the parent bullet point (which allows for a tree structure). It must be null if it is not nested                                                            |
+| `order`      | A sequential number, starting from zero, representing the bullet point index in the direct children of its parent. (ex. 2, meaning that it is the parent's third child) |
+| `type`       | The type that the bullet point represents (ex. text, code, etc.). See the complete [list of types]()                                                                    |
+
+## Versioning
+
+The specification follows [semantic versioning](https://semver.org). The `version` field in the metadata contains the current major version of the file
+
+If the version is larger than what some parser currently supports (ex. metadata with version 2 with parser implementing major version 1), then the file should not be opened by the parser, since the parser is trying to read a version that is not compatible with its implementation
+
+For example, if in a major version 2 we rename a [bullet point type](), a parser following major version 1 will not know about this renaming and will incorrectly ignore the bullet point
+
+However, if the parser implements a major version larger than the file's version, it should be able to open and edit the older major version. In other words, a parser that supports a major version X should support all major versions older than X
+
+## Bullet point types
+
+### `text`
+
+### `quote`
+
+### `divider`
+
+### `code`
+
+### `image`
+
+### `file`
+
+## Handling inconsistencies
+
+This section lists and details some inconsistency scenarios that could (but should not) eventually be found in a TreeWrite file, and how a parser should behave in each scenario
+
+### `parent` points to an `id` that does not exist in the file
+
+### Cycle in the tree (A is the parent of B, B is the parent of C, C is the parent of A)
+
+### Duplicate `id`
+
+### `id` that is not a valid ULID
+
+### Line with syntactically invalid JSON
+
+### Required field missing
+
+### `type` recognized but wrong schema for that type
+
+### Metadata with invalid schema
+
+### `version` with a major greater than what the parser supports
