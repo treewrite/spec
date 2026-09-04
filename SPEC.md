@@ -12,7 +12,7 @@ The TreeWrite file format was created specifically for the [TreeWrite text edito
 
 It's an open format, meaning any outliner or developer can use this format for any purpose. The specification license is [CC0 1.0 Universal](https://github.com/treewrite/spec/blob/main/LICENSE)
 
-To understand why we created a new specification instead of using an existing one (such as [OPML 2.0](https://opml.org/spec2.opml)), see [this section]()
+To understand why we created a new specification instead of using an existing one (such as [OPML 2.0](https://opml.org/spec2.opml)), see [this section](#why-jsonl)
 
 ## Conventions used in this document
 
@@ -49,9 +49,9 @@ There are motivations behind the decision to use `.jsonl` and not other storage 
 
 The first line of the file is a JSON object containing file metadata. The object has the following fields:
 
-| Field     | Description                                                                                                                            |
-| --------- | -------------------------------------------------------------------------------------------------------------------------------------- |
-| `version` | The current major version (ex. 1) of the specification that the file is following. See the [Versioning]() section for more information |
+| Field     | Description                                                                                                                                       |
+| --------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `version` | The current major version (ex. 1) of the specification that the file is following. See the [Versioning](#versioning) section for more information |
 
 ## Bullet point format
 
@@ -63,7 +63,7 @@ All lines in the file, except the first, represent bullet points. Each bullet po
 | `updated_at` | Last bullet point update date. Represented by a number, the total milliseconds since the [Unix epoch](https://en.wikipedia.org/wiki/Unix_time)                          |
 | `parent`     | The ULID of the parent bullet point (which allows for a tree structure). It MUST be null if it is not nested                                                            |
 | `order`      | A sequential number, starting from zero, representing the bullet point index in the direct children of its parent. (ex. 2, meaning that it is the parent's third child) |
-| `type`       | The type that the bullet point represents (ex. text, code, etc.). See the complete [list of types]()                                                                    |
+| `type`       | The type that the bullet point represents (ex. text, code, etc.). See the complete [list of types](#bullet-point-types)                                                 |
 
 ## Versioning
 
@@ -71,7 +71,7 @@ The specification follows [semantic versioning](https://semver.org). The `versio
 
 If the version is larger than what some parser currently supports (ex. metadata with version 2 with parser implementing major version 1), then the file MUST NOT be opened by the parser, since the parser is trying to read a version that is not compatible with its implementation
 
-For example, if in a major version 2 we rename a [bullet point type](), a parser following major version 1 will not know about this renaming and will incorrectly ignore the bullet point
+For example, if in a major version 2 we rename a [bullet point type](#bullet-point-types), a parser following major version 1 will not know about this renaming and will incorrectly ignore the bullet point
 
 However, if the parser implements a major version larger than the file's version, it MUST be able to open and edit the older major version. In other words, a parser that supports a major version X MUST support all major versions older than X
 
@@ -81,9 +81,9 @@ However, if the parser implements a major version larger than the file's version
 
 The `text` type represents any single-paragraph text (without new lines). New lines are not supported as they can easily be represented by new bullets. It has the following fields:
 
-| Field  | Description                                                        |
-| ------ | ------------------------------------------------------------------ |
-| `text` | A string without newlines (`\n`). Accepts [Inline markdown text]() |
+| Field  | Description                                                                             |
+| ------ | --------------------------------------------------------------------------------------- |
+| `text` | A string without newlines (`\n`). Accepts [Inline markdown text](#inline-markdown-text) |
 
 ### `quote`
 
@@ -91,7 +91,7 @@ The `quote` type represents a quote from an author. It has the following fields:
 
 | Field    | Description                                                                                           |
 | -------- | ----------------------------------------------------------------------------------------------------- |
-| `text`   | The quotation itself. Accepts [Inline markdown text]()                                                |
+| `text`   | The quotation itself. Accepts [Inline markdown text](#inline-markdown-text)                           |
 | `author` | The name of the author who quoted this quote. Semantically, it can be any source (person, book, etc.) |
 
 ### `divider`
@@ -151,7 +151,7 @@ Treat this as an invalid file. The parser MUST NOT open the TreeWrite file
 
 ### `version` with a major greater than what the parser supports
 
-As discussed in the [Versioning]() section, the parser MUST NOT open the file
+As discussed in the [Versioning](#versioning) section, the parser MUST NOT open the file
 
 ### Duplicate `order` for the same `parent`
 
