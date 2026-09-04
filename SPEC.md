@@ -77,11 +77,7 @@ However, if the parser implements a major version larger than the file's version
 
 ### `divider`
 
-### `code`
-
-### `image`
-
-### `file`
+The divider type does not have any custom fields. It represents a line that visually divides the user interface
 
 ## Handling inconsistencies
 
